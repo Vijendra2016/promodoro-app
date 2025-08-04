@@ -41,11 +41,11 @@ export default function TaskList({ setActiveTask }: { setActiveTask: (task: stri
           Add
         </button>
       </div>
-      <ul className="space-y-2">
+      <ul className="space-y-2 text-white">
         {tasks.map((task) => (
           <li
             key={task.id}
-            className={`p-2 border rounded flex justify-between items-center ${
+            className={`p-2 border border-white rounded flex justify-between items-center ${
               task.completed ? "line-through  text-white" : ""
             }`}
           >
