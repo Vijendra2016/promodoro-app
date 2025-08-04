@@ -75,8 +75,7 @@ export default function Timer({ activeTask }: { activeTask?: string }) {
           body: activeTask
             ? `Finished: ${activeTask}. Take a short break!`
             : "Take a short break before your next session.",
-          icon: "/favicon.ico",
-          vibrate: [200, 100, 200],
+         
         });
       }
 
