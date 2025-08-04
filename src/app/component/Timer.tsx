@@ -106,16 +106,16 @@ export default function Timer({ activeTask }: { activeTask?: string }) {
           value={percentage}
           text={formatTime(timeLeft)}
           styles={buildStyles({
-            textColor: "#000",
+            textColor: "#ffff",
             pathColor: isRunning ? "#16a34a" : "#dc2626",
             trailColor: "#d1d5db",
           })}
         />
       </div>
 
-      {activeTask && <p className="mb-4 text-lg">⏳ Working on: {activeTask}</p>}
+      {activeTask && <p className="mb-4  text-white text-lg">⏳ Working on: {activeTask}</p>}
 
-      <p className="mb-4 text-xl font-semibold">
+      <p className="mb-4  text-white text-xl font-semibold">
         ✅ Pomodoros completed today: {dailyCount}
       </p>
 

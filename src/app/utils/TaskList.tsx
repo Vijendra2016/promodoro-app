@@ -29,12 +29,12 @@ export default function TaskList({ setActiveTask }: { setActiveTask: (task: stri
 
   return (
     <div className="mt-6 w-full max-w-md mx-auto">
-      <h2 className="text-xl font-semibold mb-4">Tasks</h2>
+      <h2 className="text-xl font-semibold text-white  mb-4">Tasks</h2>
       <div className="flex gap-2 mb-4">
         <input
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
-          className="flex-1 border px-2 py-1 rounded"
+          className="flex-1  text-white border border-white px-2 py-1 rounded"
           placeholder="New task..."
         />
         <button onClick={addTask} className="px-4 py-1 bg-blue-500 text-white rounded">
@@ -46,7 +46,7 @@ export default function TaskList({ setActiveTask }: { setActiveTask: (task: stri
           <li
             key={task.id}
             className={`p-2 border rounded flex justify-between items-center ${
-              task.completed ? "line-through text-gray-400" : ""
+              task.completed ? "line-through  text-white" : ""
             }`}
           >
             <span onClick={() => toggleTask(task.id)} className="cursor-pointer flex-1">
