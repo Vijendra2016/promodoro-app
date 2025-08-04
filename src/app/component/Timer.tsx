@@ -5,7 +5,7 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 export default function Timer({ activeTask }: { activeTask?: string }) {
-  const totalTime = 1 * 60; // 25 minutes
+  const totalTime = 25 * 60; // 25 minutes
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [isRunning, setIsRunning] = useState(false);
   const [dailyCount, setDailyCount] = useState(0);
