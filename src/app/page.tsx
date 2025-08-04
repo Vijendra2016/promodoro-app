@@ -9,7 +9,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center py-10">
-      <h1 className="text-3xl text-white font-bold mb-10">Vijendra pomodoro app</h1>
+      <h1 className="text-3xl text-white   font-[family-name:var(--font-geist-mono)] font-light
+ mb-10">Vijendra pomodoro app</h1>
       <Timer activeTask={activeTask} />
       <TaskList setActiveTask={setActiveTask} /> {/* ✅ Pass prop here */}
     
