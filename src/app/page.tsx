@@ -19,6 +19,9 @@ export default function Home() {
           <br />
           <span className="text-base">from Meditations, Book 12</span>
         </h1>
+
+
+         <h2 className="text-sm text-white font-[family-name:var(--font-geist-mono)] font-light mb-10">Here’s the basic formula: After [CURRENT HABIT], I will [TRACK MY HABIT].</h2>
       </div>
     </div>
 
@@ -45,7 +48,9 @@ export default function Home() {
     </div>
 
   </div>
+ 
 </div>
+
 
 
   );
