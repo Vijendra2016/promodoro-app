@@ -5,62 +5,49 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 export default function Timer({ activeTask }: { activeTask?: string }) {
-  const totalTime = 25 * 60; // 25 minutes
-  const [timeLeft, setTimeLeft] = useState(totalTime);
+  const totalTime = 25 * 60 * 1000; // 25 minutes in ms
+  const [startTime, setStartTime] = useState<number | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [dailyCount, setDailyCount] = useState(0);
+  const [now, setNow] = useState(Date.now());
 
-  // Helper to get today's date as YYYY-MM-DD
   const getToday = () => new Date().toISOString().split("T")[0];
 
-  // 1️⃣ Load state + daily count on mount
+  // Load from localStorage on mount
   useEffect(() => {
-    const savedTime = localStorage.getItem("pomodoro-timeLeft");
+    const savedStart = localStorage.getItem("pomodoro-startTime");
     const savedRunning = localStorage.getItem("pomodoro-isRunning");
-    const savedTimestamp = localStorage.getItem("pomodoro-timestamp");
 
-    if (savedTime) {
-      let remaining = parseInt(savedTime, 10);
-      const running = savedRunning === "true";
+    if (savedStart) setStartTime(parseInt(savedStart));
+    if (savedRunning === "true") setIsRunning(true);
 
-      // Calculate elapsed if timer was running
-      if (running && savedTimestamp) {
-        const elapsed = Math.floor((Date.now() - parseInt(savedTimestamp, 10)) / 1000);
-        remaining -= elapsed;
-        if (remaining < 0) remaining = 0;
-      }
-
-      setTimeLeft(remaining || totalTime);
-      setIsRunning(running && remaining > 0);
-    }
-
-    // Load today's Pomodoro count
     const history = JSON.parse(localStorage.getItem("pomodoro-history") || "[]");
     const todayCount = history.filter((item: string) => item === getToday()).length;
     setDailyCount(todayCount);
   }, []);
 
-  // 2️⃣ Save timer state
+  // Save state to localStorage
   useEffect(() => {
-    localStorage.setItem("pomodoro-timeLeft", timeLeft.toString());
+    if (startTime) localStorage.setItem("pomodoro-startTime", startTime.toString());
     localStorage.setItem("pomodoro-isRunning", isRunning.toString());
-    if (isRunning) {
-      localStorage.setItem("pomodoro-timestamp", Date.now().toString());
-    }
-  }, [timeLeft, isRunning]);
+  }, [startTime, isRunning]);
 
-  // 3️⃣ Timer countdown
+  // Update current time every second
   useEffect(() => {
-    if (!isRunning || timeLeft <= 0) return;
+    if (!isRunning) return;
 
-    const timer = setInterval(() => {
-      setTimeLeft((t) => t - 1);
+    const interval = setInterval(() => {
+      setNow(Date.now());
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [isRunning, timeLeft]);
+    return () => clearInterval(interval);
+  }, [isRunning]);
 
-  // 4️⃣ Completion logic with history tracking
+  const elapsed = startTime ? now - startTime : 0;
+  const timeLeft = Math.max(0, totalTime - elapsed);
+  const percentage = ((totalTime - timeLeft) / totalTime) * 100;
+
+  // Completion logic
   useEffect(() => {
     if (timeLeft === 0 && isRunning) {
       setIsRunning(false);
@@ -69,59 +56,75 @@ export default function Timer({ activeTask }: { activeTask?: string }) {
       const audio = new Audio("/shri-krishna-mantra.mp3");
       audio.play().catch(() => console.warn("Autoplay blocked"));
 
-      // Show notification
+      // Notification
       if (Notification.permission === "granted") {
         new Notification("⏰ Pomodoro Complete!", {
           body: activeTask
             ? `Finished: ${activeTask}. Take a short break!`
             : "Take a short break before your next session.",
-         
         });
       }
 
-      // Save to daily history
+      // Save to history
       const today = getToday();
       const history = JSON.parse(localStorage.getItem("pomodoro-history") || "[]");
       history.push(today);
       localStorage.setItem("pomodoro-history", JSON.stringify(history));
 
-      // Update daily count
       const todayCount = history.filter((item: string) => item === today).length;
       setDailyCount(todayCount);
+
+      localStorage.removeItem("pomodoro-startTime");
     }
   }, [timeLeft, isRunning, activeTask]);
 
-  const formatTime = (seconds: number) => {
+  const formatTime = (ms: number) => {
+    const seconds = Math.floor(ms / 1000);
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
-  const percentage = ((totalTime - timeLeft) / totalTime) * 100;
+  const todayDate = new Date().toLocaleDateString("en-IN", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 
   return (
     <div className="flex flex-col items-center">
-      <div className="w-40 h-40 mb-6">
+      <div className="w-40 h-40 mb-2">
         <CircularProgressbar
           value={percentage}
           text={formatTime(timeLeft)}
           styles={buildStyles({
-            textColor: "#ffff",
+            textColor: "#ffffff",
             pathColor: isRunning ? "#16a34a" : "#dc2626",
             trailColor: "#d1d5db",
           })}
         />
       </div>
 
-      {activeTask && <p className="mb-4  text-white text-lg">⏳ Working on: {activeTask}</p>}
+      {/* ✅ Display Today's Date */}
+      <p className="mb-2 text-white text-sm">📅 {todayDate}</p>
 
-      <p className="mb-4  text-white text-xl font-semibold">
+      {activeTask && (
+        <p className="mb-4 text-white text-lg">⏳ Working on: {activeTask}</p>
+      )}
+
+      <p className="mb-4 text-white text-xl font-semibold">
         ✅ Pomodoros completed today: {dailyCount}
       </p>
 
       <div className="flex gap-4">
         <button
-          onClick={() => setIsRunning(!isRunning)}
+          onClick={() => {
+            if (!isRunning) {
+              setStartTime(Date.now());
+            }
+            setIsRunning(!isRunning);
+          }}
           className="px-4 py-2 bg-green-500 text-white rounded"
         >
           {isRunning ? "Pause" : "Start"}
@@ -129,8 +132,8 @@ export default function Timer({ activeTask }: { activeTask?: string }) {
         <button
           onClick={() => {
             setIsRunning(false);
-            setTimeLeft(totalTime);
-            localStorage.removeItem("pomodoro-timestamp");
+            setStartTime(null);
+            localStorage.removeItem("pomodoro-startTime");
           }}
           className="px-4 py-2 bg-red-500 text-white rounded"
         >
