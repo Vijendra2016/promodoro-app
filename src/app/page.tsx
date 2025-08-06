@@ -17,7 +17,15 @@ export default function Home() {
         <h1 className="text-xl text-white font-[family-name:var(--font-geist-mono)] font-light mb-10">
           “You have power over your mind — not outside events. Realize this, and you will find strength.”
           <br />
-          <span className="text-base">from Meditations, Book 12</span>
+          <span className="text-base">from  marcus aurelius / Meditations, Book 12</span>
+        </h1>
+
+
+<br></br>
+ <h1 className="text-xl text-white font-[family-name:var(--font-geist-mono)] font-light mb-10">
+          “Life is hard. Once you accept that, it becomes easier.”
+          <br />
+          <span className="text-base"> M. Scott Peck, The Road Less Traveled</span>
         </h1>
 
 
